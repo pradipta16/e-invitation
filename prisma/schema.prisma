@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Invitation {
+  id              String   @id @default(uuid())
+  ownerId         String   @map("owner_id")
+  eventName       String   @map("event_name")
+  eventDate       DateTime @map("event_date")
+  defaultThemeId  String?  @map("default_theme_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  defaultTheme    Theme?        @relation("DefaultTheme", fields: [defaultThemeId], references: [id])
+  themes          Theme[]       @relation("InvitationThemes")
+  guestGroups     GuestGroup[]
+  guests          Guest[]
+
+  @@map("invitations")
+}
+
+model Theme {
+  id            String   @id @default(uuid())
+  invitationId  String   @map("invitation_id")
+  name          String
+  config        Json
+
+  invitation      Invitation   @relation("InvitationThemes", fields: [invitationId], references: [id], onDelete: Cascade)
+  defaultForInvs  Invitation[] @relation("DefaultTheme")
+  guestGroups     GuestGroup[]
+  guests          Guest[]
+
+  @@map("themes")
+}
+
+model GuestGroup {
+  id            String @id @default(uuid())
+  invitationId  String @map("invitation_id")
+  themeId       String @map("theme_id")
+  name          String
+
+  invitation Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  theme      Theme      @relation(fields: [themeId], references: [id])
+  guests     Guest[]
+
+  @@map("guest_groups")
+}
+
+model Guest {
+  id            String  @id @default(uuid())
+  invitationId  String  @map("invitation_id")
+  guestGroupId  String? @map("guest_group_id")
+  themeId       String? @map("theme_id")
+  name          String
+  uniqueCode    String  @unique @map("unique_code")
+  phone         String?
+
+  invitation Invitation  @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  guestGroup GuestGroup? @relation(fields: [guestGroupId], references: [id])
+  theme      Theme?      @relation(fields: [themeId], references: [id])
+  rsvp       Rsvp?
+  wishes     Wish[]
+
+  @@map("guests")
+}
+
+model Rsvp {
+  id          String  @id @default(uuid())
+  guestId     String  @unique @map("guest_id")
+  attending   Boolean
+  guestCount  Int     @map("guest_count")
+
+  guest Guest @relation(fields: [guestId], references: [id], onDelete: Cascade)
+
+  @@map("rsvps")
+}
+
+model Wish {
+  id          String  @id @default(uuid())
+  guestId     String  @map("guest_id")
+  message     String
+  isApproved  Boolean @default(false) @map("is_approved")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  guest Guest @relation(fields: [guestId], references: [id], onDelete: Cascade)
+
+  @@map("wishes")
+}

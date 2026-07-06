@@ -2,7 +2,19 @@
   "permissions": {
     "allow": [
       "Bash(npm -v)",
-      "Bash(npx --yes create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm --no-turbopack)"
+      "Bash(npx --yes create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm --no-turbopack)",
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:3000/SITI01)",
+      "Bash(curl -s http://localhost:3000/BUDI01)",
+      "Bash(curl -s http://localhost:3000/RIAN01)",
+      "Bash(curl -s http://localhost:3000/UMUM01)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/NOTEXIST)",
+      "Bash(kill %1)",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(curl -s -o /dev/null -w \"port 3000 status: %{http_code}\\\\n\" http://localhost:3000/SITI01)",
+      "Bash(rm -rf .next)",
+      "Bash(taskkill //F //PID 1264)",
+      "Bash(curl *)"
     ]
   }
 }
